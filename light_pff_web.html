@@ -95,7 +95,7 @@
 </style>
     </style>
 </head>
-<body class="light-on">
+<body class="light-on" onmousedown="startSwipe(event)" onmousemove="swipe(event)" onmouseup="endSwipe()">
     <!-- 灯泡部分 -->
     <svg width="100vw" height="100vh" viewBox="0 0 100 150">
         <circle class="bulb" cx="50" cy="50" r="40" onclick="toggleLight()"></circle>
@@ -174,7 +174,9 @@
         function toggleLight() {
             const bulb = document.querySelector('.bulb');
             const body = document.querySelector('body');
-            const defaultCountdownValue = parseInt(document.getElementById('defaultCountdown').value) || 1; // 获取默认倒计时值
+            const defaultCountdownValue = parseInt(document.getElementById('defaultCountdown').value) || 1;
+
+            clearInterval(countdownInterval); // 清除已存在的定时器
 
             if (isLightOn) {
                 // 从当前显示的值开始倒计时
@@ -206,13 +208,13 @@
                 bulb.classList.remove('bulb-off');
                 body.classList.add('light-on');
                 body.classList.remove('light-off');
-                clearInterval(countdownInterval);
-                countdownElement.textContent = defaultCountdownValue.toString(); // 使用默认的倒计时值
+                countdownElement.textContent = defaultCountdownValue.toString();
                 countdownElement.setAttribute('visibility', 'visible');
                 sendCommand('lighton');
                 isLightOn = true;
             }
         }
+
 
 
 
@@ -255,6 +257,33 @@
             countdownElement.textContent = currentValue + 1;
         }
         
+        let isSwiping = false;
+        let startX = 0;
+
+        function startSwipe(e) {
+            isSwiping = true;
+            startX = e.clientX;
+        }
+
+        function swipe(e) {
+            if (!isSwiping) return;
+
+            const deltaX = e.clientX - startX;  // 计算横向滑动的距离
+
+            if (deltaX > 50) {  
+                decreaseCountdown();  // 向右滑动时减少计时器
+                startX = e.clientX;
+            } else if (deltaX < -50) {  
+                increaseCountdown();  // 向左滑动时增加计时器
+                startX = e.clientX;
+            }
+
+        }
+
+        function endSwipe() {
+            isSwiping = false;
+        }
+
     </script>
     
     
