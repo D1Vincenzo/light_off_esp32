@@ -95,7 +95,7 @@
 </style>
     </style>
 </head>
-<body class="light-on" onmousedown="startSwipe(event)" onmousemove="swipe(event)" onmouseup="endSwipe()">
+<body class="light-on" onmousedown="startSwipe(event)" onmousemove="swipe(event)" onmouseup="endSwipe()" ontouchstart="startSwipe(event)" ontouchmove="swipe(event)" ontouchend="endSwipe()">
     <!-- 灯泡部分 -->
     <svg width="100vw" height="100vh" viewBox="0 0 100 150">
         <circle class="bulb" cx="50" cy="50" r="40" onclick="toggleLight()"></circle>
@@ -262,23 +262,26 @@
 
         function startSwipe(e) {
             isSwiping = true;
-            startX = e.clientX;
+            // 判断是鼠标事件还是触摸事件，并相应地获取坐标
+            startX = (e.type === 'mousedown') ? e.clientX : e.touches[0].clientX;
         }
 
         function swipe(e) {
             if (!isSwiping) return;
 
-            const deltaX = e.clientX - startX;  // 计算横向滑动的距离
+            // 同样，根据事件类型获取坐标
+            const currentX = (e.type === 'mousemove') ? e.clientX : e.touches[0].clientX;
+            const deltaX = currentX - startX;
 
-            if (deltaX > 50) {  
-                decreaseCountdown();  // 向右滑动时减少计时器
-                startX = e.clientX;
-            } else if (deltaX < -50) {  
-                increaseCountdown();  // 向左滑动时增加计时器
-                startX = e.clientX;
+            if (deltaX > 50) {
+                decreaseCountdown();
+                startX = currentX;
+            } else if (deltaX < -50) {
+                increaseCountdown();
+                startX = currentX;
             }
-
         }
+
 
         function endSwipe() {
             isSwiping = false;
